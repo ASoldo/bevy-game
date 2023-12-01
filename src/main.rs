@@ -28,8 +28,8 @@ struct Configuration {
 }
 
 #[cfg(feature = "inspector")]
-#[derive(Reflect, Resource, Default, InspectorOptions)]
-#[reflect(Resource, InspectorOptions)]
+#[derive(Reflect, Resource, Default)]
+#[reflect(Resource)]
 struct MyComponent {
     name: String,
     config: Configuration,
