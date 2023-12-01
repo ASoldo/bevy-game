@@ -12,8 +12,8 @@ use scenes::scene1::{generate_scene_json, SceneData};
 use bevy_egui::EguiPlugin;
 #[cfg(feature = "inspector")]
 use bevy_inspector_egui::prelude::*;
-#[cfg(feature = "inspector")]
-use bevy_inspector_egui::quick::ResourceInspectorPlugin;
+// #[cfg(feature = "inspector")]
+// use bevy_inspector_egui::quick::ResourceInspectorPlugin;
 use serde_json;
 // use bevy_mod_picking::events::{Drag, Pointer};
 #[cfg(feature = "inspector")]
@@ -75,10 +75,10 @@ fn main() {
             .register_type::<Configuration>()
             .register_type::<MyComponent>()
             .register_type::<SelectedEntity>()
-            .add_plugins(ResourceInspectorPlugin::<Configuration>::default())
-            .add_plugins(ResourceInspectorPlugin::<MyComponent>::default())
-            .add_plugins(ResourceInspectorPlugin::<SelectedEntity>::default())
-            .add_plugins(ResourceInspectorPlugin::<Time>::default())
+            // .add_plugins(ResourceInspectorPlugin::<Configuration>::default())
+            // .add_plugins(ResourceInspectorPlugin::<MyComponent>::default())
+            // .add_plugins(ResourceInspectorPlugin::<SelectedEntity>::default())
+            // .add_plugins(ResourceInspectorPlugin::<Time>::default())
             .add_plugins(DefaultPickingPlugins)
             .add_plugins(WorldInspectorPlugin::new());
     }
@@ -86,40 +86,28 @@ fn main() {
     app.run();
 }
 
-fn setup(mut commands: Commands, mut selected_entity: Option<ResMut<SelectedEntity>>) {
+fn setup(mut commands: Commands) {
     let scene_json = generate_scene_json(); // Generate or load the JSON string
     let scene_data: SceneData = serde_json::from_str(&scene_json).expect("Failed to parse JSON");
     commands.spawn(Camera2dBundle::default());
-    #[cfg(feature = "inspector")]
-    if let Some(selected_entity) = &mut selected_entity {
-        selected_entity.0.clear();
-    }
 
     // Store all spawned entities
     for entity_data in &scene_data.entities {
-        let entity = commands
-            .spawn((
-                Name::from(entity_data.name.clone()),
-                SpriteBundle {
-                    sprite: Sprite {
-                        color: Color::rgb(0.25, 0.25, 0.75),
-                        custom_size: Some(Vec2::new(10., 10.)),
-                        ..default()
-                    },
-                    transform: Transform::from_translation(Vec3::new(
-                        entity_data.position.x,
-                        entity_data.position.y,
-                        0.,
-                    )),
+        commands.spawn((
+            Name::from(entity_data.name.clone()),
+            SpriteBundle {
+                sprite: Sprite {
+                    color: Color::rgb(0.25, 0.25, 0.75),
+                    custom_size: Some(Vec2::new(10., 10.)),
                     ..default()
                 },
-            ))
-            .id();
-
-        // Add the entity to the list
-        #[cfg(feature = "inspector")]
-        if let Some(selected_entity) = &mut selected_entity {
-            selected_entity.0.push(entity);
-        }
+                transform: Transform::from_translation(Vec3::new(
+                    entity_data.position.x,
+                    entity_data.position.y,
+                    0.,
+                )),
+                ..default()
+            },
+        ));
     }
 }
