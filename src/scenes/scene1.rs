@@ -1,30 +1,37 @@
-use bevy::prelude::Vec2;
-use serde::{Deserialize, Serialize};
+use crate::components::component::MarkerComponent;
+use bevy::prelude::*;
 
-#[derive(Serialize, Deserialize)]
-pub struct SceneData {
-    pub entities: Vec<EntityData>,
+struct SceneData {
+    entities: Vec<EntityData>,
 }
 
-#[derive(Serialize, Deserialize)]
-pub struct EntityData {
-    pub name: String,
-    pub position: Vec2,
+struct EntityData {
+    name: String,
+    position: Vec3,
 }
 
-pub fn generate_scene_json() -> String {
+pub fn setup_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
     let scene = SceneData {
-        entities: vec![
-            EntityData {
-                name: "Entity1".to_string(),
-                position: Vec2::new(0.0, 0.0),
-            },
-            EntityData {
-                name: "Entity2".to_string(),
-                position: Vec2::new(10.0, 0.0),
-            },
-        ],
+        entities: vec![EntityData {
+            name: "Entity1".to_string(),
+            position: Vec3::new(0.0, 0.0, 0.0),
+        }],
     };
 
-    serde_json::to_string(&scene).expect("Failed to serialize scene")
+    commands.spawn(Camera2dBundle::default());
+
+    for entity_data in &scene.entities {
+        commands.spawn((
+            Name::new(entity_data.name.clone()),
+            MarkerComponent {
+                marker: "Scene1".to_string(),
+            },
+            SpriteBundle {
+                sprite: Sprite::default(),
+                texture: asset_server.load("img/Logo.png"),
+                transform: Transform::from_translation(entity_data.position),
+                ..default()
+            },
+        ));
+    }
 }

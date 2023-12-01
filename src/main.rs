@@ -1,21 +1,18 @@
 mod scenes;
-use bevy::core::Name;
-use bevy::ecs::prelude::*;
 use bevy::prelude::*;
 use bevy::window::{PresentMode, Window, WindowPlugin, WindowTheme};
 
-#[cfg(feature = "inspector")]
-use bevy_inspector_egui::quick::WorldInspectorPlugin;
-use scenes::scene1::{generate_scene_json, SceneData};
+use scenes::scene1::setup_scene;
+
+mod components;
+use crate::components::component::MarkerComponent;
 
 #[cfg(feature = "inspector")]
 use bevy_egui::EguiPlugin;
 #[cfg(feature = "inspector")]
 use bevy_inspector_egui::prelude::*;
-// #[cfg(feature = "inspector")]
-// use bevy_inspector_egui::quick::ResourceInspectorPlugin;
-use serde_json;
-// use bevy_mod_picking::events::{Drag, Pointer};
+#[cfg(feature = "inspector")]
+use bevy_inspector_egui::quick::WorldInspectorPlugin;
 #[cfg(feature = "inspector")]
 use bevy_mod_picking::DefaultPickingPlugins;
 // use bevy_mod_picking::{prelude::On, PickableBundle};
@@ -29,6 +26,7 @@ struct Configuration {
     #[inspector(min = 0.0, max = 1.0)]
     option: f32,
 }
+
 #[cfg(feature = "inspector")]
 #[derive(Reflect, Resource, Default, InspectorOptions)]
 #[reflect(Resource, InspectorOptions)]
@@ -36,15 +34,6 @@ struct MyComponent {
     name: String,
     config: Configuration,
 }
-
-#[cfg(feature = "inspector")]
-#[derive(Reflect, Resource, Default, InspectorOptions)]
-#[reflect(Resource, InspectorOptions)]
-struct SelectedEntity(Vec<Entity>);
-
-#[cfg(not(feature = "inspector"))]
-#[derive(Resource, Default)]
-struct SelectedEntity(Vec<Entity>);
 
 fn main() {
     println!("Start App");
@@ -64,50 +53,25 @@ fn main() {
         }),
         ..default()
     }))
-    .add_systems(Startup, setup);
+    .init_resource::<MarkerComponent>()
+    .register_type::<MarkerComponent>()
+    .add_systems(Startup, setup_scene);
 
     #[cfg(feature = "inspector")]
     {
         app.add_plugins(EguiPlugin)
             .init_resource::<Configuration>()
             .init_resource::<MyComponent>()
-            .init_resource::<SelectedEntity>()
+            .init_resource::<MarkerComponent>()
             .register_type::<Configuration>()
             .register_type::<MyComponent>()
-            .register_type::<SelectedEntity>()
+            .register_type::<MarkerComponent>()
             // .add_plugins(ResourceInspectorPlugin::<Configuration>::default())
             // .add_plugins(ResourceInspectorPlugin::<MyComponent>::default())
-            // .add_plugins(ResourceInspectorPlugin::<SelectedEntity>::default())
             // .add_plugins(ResourceInspectorPlugin::<Time>::default())
             .add_plugins(DefaultPickingPlugins)
             .add_plugins(WorldInspectorPlugin::new());
     }
 
     app.run();
-}
-
-fn setup(mut commands: Commands) {
-    let scene_json = generate_scene_json(); // Generate or load the JSON string
-    let scene_data: SceneData = serde_json::from_str(&scene_json).expect("Failed to parse JSON");
-    commands.spawn(Camera2dBundle::default());
-
-    // Store all spawned entities
-    for entity_data in &scene_data.entities {
-        commands.spawn((
-            Name::from(entity_data.name.clone()),
-            SpriteBundle {
-                sprite: Sprite {
-                    color: Color::rgb(0.25, 0.25, 0.75),
-                    custom_size: Some(Vec2::new(10., 10.)),
-                    ..default()
-                },
-                transform: Transform::from_translation(Vec3::new(
-                    entity_data.position.x,
-                    entity_data.position.y,
-                    0.,
-                )),
-                ..default()
-            },
-        ));
-    }
 }
