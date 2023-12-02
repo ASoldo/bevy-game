@@ -6,15 +6,79 @@ use bevy::prelude::*;
 use bevy::window::{PresentMode, Window, WindowPlugin, WindowTheme};
 
 use scenes::scene1::setup_scene;
-use serde_json;
 
 mod components;
 use crate::components::component::MarkerComponent;
 use bevy_mod_reqwest::*;
+use serde_json;
+
+use bevy_web_asset::WebAssetPlugin;
 
 #[derive(Resource)]
 struct ReqTimer(pub Timer);
 
+#[derive(Resource, Default, Reflect)]
+#[reflect(Resource, Default)]
+struct PokemonName {
+    name: Option<String>,
+    created: bool,
+    ui_entity: Option<Entity>, // Store the UI entity
+}
+
+fn create_pokemon_name_ui(
+    mut commands: Commands,
+    pokemon_name: &mut ResMut<PokemonName>,
+    asset_server: Res<AssetServer>,
+) {
+    let entity = commands
+        .spawn(
+            TextBundle::from_section(
+                pokemon_name
+                    .name
+                    .as_ref()
+                    .unwrap_or(&"Loading...".to_string()),
+                TextStyle {
+                    font: asset_server.load("fonts/Classyvogueregular.ttf"),
+                    font_size: 50.0,
+                    color: Color::WHITE,
+                    ..default()
+                },
+            )
+            .with_text_alignment(TextAlignment::Center)
+            .with_style(Style {
+                position_type: PositionType::Absolute,
+                justify_self: JustifySelf::Center,
+                align_self: AlignSelf::End,
+                bottom: Val::Px(100.0),
+
+                ..default()
+            }),
+        )
+        .insert(Name::new("Pokemon Name UI"))
+        .id();
+    pokemon_name.ui_entity = Some(entity);
+}
+
+fn update_pokemon_name_ui(pokemon_name: Res<PokemonName>, mut query: Query<&mut Text>) {
+    if let Some(entity) = pokemon_name.ui_entity {
+        if let Ok(mut text) = query.get_mut(entity) {
+            text.sections[0].value = pokemon_name.name.clone().unwrap_or_default();
+        }
+    }
+}
+
+fn display_pokemon_name(
+    commands: Commands,
+    asset_server: Res<AssetServer>,
+    mut pokemon_name: ResMut<PokemonName>,
+) {
+    if let Some(_name) = &pokemon_name.name {
+        if !pokemon_name.created {
+            create_pokemon_name_ui(commands, &mut pokemon_name, asset_server);
+            pokemon_name.created = true;
+        }
+    }
+}
 fn send_requests(mut commands: Commands, _time: Res<Time>, mut _timer: ResMut<ReqTimer>) {
     // timer.0.tick(time.delta());
     //
@@ -27,12 +91,30 @@ fn send_requests(mut commands: Commands, _time: Res<Time>, mut _timer: ResMut<Re
     // }
 }
 
-fn handle_responses(mut commands: Commands, results: Query<(Entity, &ReqwestBytesResult)>) {
+fn handle_responses(
+    mut commands: Commands,
+    results: Query<(Entity, &ReqwestBytesResult)>,
+    mut pokemon_name: ResMut<PokemonName>,
+    asset_server: Res<AssetServer>,
+) {
     for (e, res) in results.iter() {
+        let mut sprite_url = "".to_string();
+        let mut sprite_url_front_shiny = "".to_string();
         if let Ok(bytes) = &res.0 {
             if let Ok(json) = serde_json::from_slice::<serde_json::Value>(bytes) {
                 if let Some(name) = json["name"].as_str() {
                     bevy::log::info!("Pokemon Name: {}", name);
+                    pokemon_name.name = Some(name.to_string());
+
+                    sprite_url = json["sprites"]["front_default"]
+                        .as_str()
+                        .unwrap_or_default()
+                        .to_string();
+                    sprite_url_front_shiny = json["sprites"]["front_shiny"]
+                        .as_str()
+                        .unwrap_or_default()
+                        .to_string();
+                    // Now sprite_url can be used outside of this block
                 } else {
                     bevy::log::error!("Name field not found in response");
                 }
@@ -42,10 +124,29 @@ fn handle_responses(mut commands: Commands, results: Query<(Entity, &ReqwestByte
         } else {
             bevy::log::error!("Request failed");
         }
+        commands
+            .spawn(SpriteBundle {
+                // Simply use a url where you would normally use an asset folder relative path
+                texture: asset_server.load(sprite_url),
+                transform: Transform::from_xyz(50., 500., 1.),
+                ..default()
+            })
+            .insert(Name::new("Pokemon Sprite"));
+
+        commands
+            .spawn(SpriteBundle {
+                // Simply use a url where you would normally use an asset folder relative path
+                texture: asset_server.load(sprite_url_front_shiny),
+                transform: Transform::from_xyz(0., 500., 1.),
+                ..default()
+            })
+            .insert(Name::new("Pokemon Sprite Pikachu"));
 
         // Done with this entity
         commands.entity(e).despawn_recursive();
     }
+
+    // Use sprite_url here to spawn the sprite
 }
 
 #[cfg(feature = "inspector")]
@@ -74,6 +175,7 @@ struct Configuration {
 struct MyComponent {
     name: String,
     config: Configuration,
+    pokemon_name: PokemonName,
 }
 
 fn main() {
@@ -81,28 +183,41 @@ fn main() {
 
     let binding = App::new();
     let mut app = binding;
-    app.add_plugins(DefaultPlugins.set(WindowPlugin {
-        primary_window: Some(Window {
-            title: "I am a Window!".into(),
-            resolution: (500., 500.).into(),
-            present_mode: PresentMode::AutoVsync,
-            fit_canvas_to_parent: true,
-            prevent_default_event_handling: false,
-            window_theme: Some(WindowTheme::Dark),
-            visible: false,
+    app.add_plugins((
+        WebAssetPlugin::default(),
+        DefaultPlugins.set(WindowPlugin {
+            primary_window: Some(Window {
+                title: "I am a Window!".into(),
+                resolution: (500., 500.).into(),
+                present_mode: PresentMode::AutoVsync,
+                fit_canvas_to_parent: true,
+                prevent_default_event_handling: false,
+                window_theme: Some(WindowTheme::Dark),
+                visible: false,
+                ..default()
+            }),
             ..default()
         }),
-        ..default()
-    }))
+    ))
     .init_resource::<MarkerComponent>()
     .register_type::<MarkerComponent>()
+    .init_resource::<PokemonName>()
+    .register_type::<PokemonName>()
     .insert_resource(ReqTimer(Timer::new(
         std::time::Duration::from_secs(1),
         TimerMode::Repeating,
     )))
+    .insert_resource(PokemonName::default())
     .add_plugins(ReqwestPlugin)
     .add_systems(Startup, (setup_scene, send_requests))
-    .add_systems(Update, (handle_responses,));
+    .add_systems(
+        Update,
+        (
+            handle_responses,
+            display_pokemon_name,
+            update_pokemon_name_ui,
+        ),
+    );
 
     #[cfg(feature = "inspector")]
     {
