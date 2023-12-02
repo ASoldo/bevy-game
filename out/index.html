@@ -12,7 +12,13 @@
       import init from "./bevy-game.js";
 
       async function run() {
-        await init();
+        try {
+          await init();
+        } catch (error) {
+          if (!error.message.startsWith("Using exceptions for control flow,")) {
+            throw error;
+          }
+        }
       }
 
       run().catch(console.error);
