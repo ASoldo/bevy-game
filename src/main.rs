@@ -1,11 +1,52 @@
 mod scenes;
+// use bevy::time::common_conditions::on_timer;
+// use std::time::Duration;
+
 use bevy::prelude::*;
 use bevy::window::{PresentMode, Window, WindowPlugin, WindowTheme};
 
 use scenes::scene1::setup_scene;
+use serde_json;
 
 mod components;
 use crate::components::component::MarkerComponent;
+use bevy_mod_reqwest::*;
+
+#[derive(Resource)]
+struct ReqTimer(pub Timer);
+
+fn send_requests(mut commands: Commands, _time: Res<Time>, mut _timer: ResMut<ReqTimer>) {
+    // timer.0.tick(time.delta());
+    //
+    // if timer.0.just_finished() {
+    if let Ok(url) = "https://pokeapi.co/api/v2/pokemon/ditto".try_into() {
+        let req = reqwest::Request::new(reqwest::Method::GET, url);
+        let req = ReqwestRequest::new(req);
+        commands.spawn(req);
+    }
+    // }
+}
+
+fn handle_responses(mut commands: Commands, results: Query<(Entity, &ReqwestBytesResult)>) {
+    for (e, res) in results.iter() {
+        if let Ok(bytes) = &res.0 {
+            if let Ok(json) = serde_json::from_slice::<serde_json::Value>(bytes) {
+                if let Some(name) = json["name"].as_str() {
+                    bevy::log::info!("Pokemon Name: {}", name);
+                } else {
+                    bevy::log::error!("Name field not found in response");
+                }
+            } else {
+                bevy::log::error!("Failed to parse JSON");
+            }
+        } else {
+            bevy::log::error!("Request failed");
+        }
+
+        // Done with this entity
+        commands.entity(e).despawn_recursive();
+    }
+}
 
 #[cfg(feature = "inspector")]
 use bevy_egui::EguiPlugin;
@@ -55,7 +96,13 @@ fn main() {
     }))
     .init_resource::<MarkerComponent>()
     .register_type::<MarkerComponent>()
-    .add_systems(Startup, setup_scene);
+    .insert_resource(ReqTimer(Timer::new(
+        std::time::Duration::from_secs(1),
+        TimerMode::Repeating,
+    )))
+    .add_plugins(ReqwestPlugin)
+    .add_systems(Startup, (setup_scene, send_requests))
+    .add_systems(Update, (handle_responses,));
 
     #[cfg(feature = "inspector")]
     {
