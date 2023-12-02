@@ -50,9 +50,7 @@ pub fn setup_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
                 position_type: PositionType::Relative,
                 bottom: Val::Px(190.0),
                 align_self: AlignSelf::End,
-                align_items: AlignItems::End,
                 justify_self: JustifySelf::Center,
-                justify_items: JustifyItems::Center,
                 ..default()
             }),
         )
