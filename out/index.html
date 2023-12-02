@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Bevy Game</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="style.css" rel="stylesheet" />
+  </head>
+
+  <body>
+    <script type="module">
+      import init from "./bevy-game.js";
+
+      async function run() {
+        await init();
+      }
+
+      run().catch(console.error);
+    </script>
+  </body>
+</html>

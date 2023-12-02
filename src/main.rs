@@ -1,10 +1,12 @@
 mod scenes;
 // use bevy::time::common_conditions::on_timer;
 // use std::time::Duration;
+//
 
 use bevy::prelude::*;
 use bevy::window::{PresentMode, Window, WindowPlugin, WindowTheme};
 
+use bevy_asset::AssetMetaCheck;
 use scenes::scene1::setup_scene;
 
 mod components;
@@ -183,41 +185,42 @@ fn main() {
 
     let binding = App::new();
     let mut app = binding;
-    app.add_plugins((
-        WebAssetPlugin::default(),
-        DefaultPlugins.set(WindowPlugin {
-            primary_window: Some(Window {
-                title: "I am a Window!".into(),
-                resolution: (500., 500.).into(),
-                present_mode: PresentMode::AutoVsync,
-                fit_canvas_to_parent: true,
-                prevent_default_event_handling: false,
-                window_theme: Some(WindowTheme::Dark),
-                visible: false,
+    app.insert_resource(AssetMetaCheck::Never)
+        .add_plugins((
+            WebAssetPlugin::default(),
+            DefaultPlugins.set(WindowPlugin {
+                primary_window: Some(Window {
+                    title: "I am a Window!".into(),
+                    resolution: (500., 500.).into(),
+                    present_mode: PresentMode::AutoVsync,
+                    fit_canvas_to_parent: true,
+                    prevent_default_event_handling: false,
+                    window_theme: Some(WindowTheme::Dark),
+                    visible: false,
+                    ..default()
+                }),
                 ..default()
             }),
-            ..default()
-        }),
-    ))
-    .init_resource::<MarkerComponent>()
-    .register_type::<MarkerComponent>()
-    .init_resource::<PokemonName>()
-    .register_type::<PokemonName>()
-    .insert_resource(ReqTimer(Timer::new(
-        std::time::Duration::from_secs(1),
-        TimerMode::Repeating,
-    )))
-    .insert_resource(PokemonName::default())
-    .add_plugins(ReqwestPlugin)
-    .add_systems(Startup, (setup_scene, send_requests))
-    .add_systems(
-        Update,
-        (
-            handle_responses,
-            display_pokemon_name,
-            update_pokemon_name_ui,
-        ),
-    );
+        ))
+        .init_resource::<MarkerComponent>()
+        .register_type::<MarkerComponent>()
+        .init_resource::<PokemonName>()
+        .register_type::<PokemonName>()
+        .insert_resource(ReqTimer(Timer::new(
+            std::time::Duration::from_secs(1),
+            TimerMode::Repeating,
+        )))
+        .insert_resource(PokemonName::default())
+        .add_plugins(ReqwestPlugin)
+        .add_systems(Startup, (setup_scene, send_requests))
+        .add_systems(
+            Update,
+            (
+                handle_responses,
+                display_pokemon_name,
+                update_pokemon_name_ui,
+            ),
+        );
 
     #[cfg(feature = "inspector")]
     {

@@ -14,5 +14,6 @@ build-debug:
   cargo build --features inspector
 
 build-release:
-  cargo build --release
+  cargo build --release --target wasm32-unknown-unknown
+
 
