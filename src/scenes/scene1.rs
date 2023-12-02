@@ -34,4 +34,27 @@ pub fn setup_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
             },
         ));
     }
+
+    commands
+        .spawn(
+            TextBundle::from_section(
+                "Rootster EnGGine",
+                TextStyle {
+                    font: asset_server.load("fonts/Classyvogueregular.ttf"),
+                    font_size: 70.0,
+                    ..default()
+                },
+            )
+            .with_text_alignment(TextAlignment::Center)
+            .with_style(Style {
+                position_type: PositionType::Relative,
+                bottom: Val::Px(190.0),
+                align_self: AlignSelf::End,
+                align_items: AlignItems::End,
+                justify_self: JustifySelf::Center,
+                justify_items: JustifyItems::Center,
+                ..default()
+            }),
+        )
+        .insert(Name::new("Text UI"));
 }
