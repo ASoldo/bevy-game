@@ -202,6 +202,8 @@ fn main() {
                 ..default()
             }),
         ))
+        .register_type::<Option<Vec2>>()
+        .register_type::<Option<Rect>>()
         .init_resource::<MarkerComponent>()
         .register_type::<MarkerComponent>()
         .init_resource::<PokemonName>()

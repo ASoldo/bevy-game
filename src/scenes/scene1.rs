@@ -27,7 +27,17 @@ pub fn setup_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
                 marker: "Scene1".to_string(),
             },
             SpriteBundle {
-                sprite: Sprite::default(),
+                sprite: Sprite {
+                    color: Color::Rgba {
+                        red: 0.,
+                        green: 255.,
+                        blue: 0.,
+                        alpha: 10.,
+                    },
+                    custom_size: Some(Vec2::new(200.0, 200.0)),
+                    ..default()
+                },
+                visibility: Visibility::Inherited,
                 texture: asset_server.load("img/Logo.png"),
                 transform: Transform::from_translation(entity_data.position),
                 ..default()
@@ -55,4 +65,11 @@ pub fn setup_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
             }),
         )
         .insert(Name::new("Text UI"));
+
+    commands
+        .spawn(DynamicSceneBundle {
+            scene: asset_server.load("scenes/scene.scn.ron"),
+            ..default()
+        })
+        .insert(Name::new("Dynamic Scene"));
 }
