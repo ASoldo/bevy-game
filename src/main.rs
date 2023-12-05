@@ -7,6 +7,7 @@ use player::{confine_player_movement, player_movement, spawn_new_player, Player}
 
 mod enemy;
 use enemy::{enemy_movement, spawn_enemy, update_enemy_direction, Enemy};
+use enemy::{confine_enemy_movement, enemy_movement, spawn_enemy, update_enemy_direction, Enemy};
 
 use bevy::prelude::*;
 use bevy::window::{PresentMode, Window, WindowPlugin, WindowTheme};
@@ -276,6 +277,7 @@ fn main() {
                 enemy_movement,
                 update_enemy_direction,
                 confine_player_movement,
+                confine_enemy_movement,
                 print_person_name.after(setup_person),
             ),
         );

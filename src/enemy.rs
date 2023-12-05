@@ -65,3 +65,33 @@ pub fn update_enemy_direction(
         }
     }
 }
+
+pub fn confine_enemy_movement(
+    mut enemy_query: Query<&mut Transform, With<Enemy>>,
+    window_query: Query<&Window, With<PrimaryWindow>>,
+) {
+    let window = window_query.get_single().unwrap();
+
+    let half_enemy_size: f32 = ENEMY_SIZE / 2.0;
+    let x_min: f32 = (window.width() / -2.0) + half_enemy_size;
+    let x_max: f32 = (window.width() / 2.0) - half_enemy_size;
+    let y_min: f32 = (window.height() / -2.0) + half_enemy_size;
+    let y_max: f32 = (window.height() / 2.0) - half_enemy_size;
+
+    for mut transform in enemy_query.iter_mut() {
+        let mut translation: Vec3 = transform.translation;
+
+        if translation.x < x_min {
+            translation.x = x_min;
+        } else if translation.x > x_max {
+            translation.x = x_max;
+        }
+
+        if translation.y < y_min {
+            translation.y = y_min;
+        } else if translation.y > y_max {
+            translation.y = y_max;
+        }
+        transform.translation = translation;
+    }
+}
