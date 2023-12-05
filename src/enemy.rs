@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
-use rand::random;
+use rand::Rng;
 
 pub const ENEMY_SPEED: f32 = 200.0;
 pub const ENEMY_SIZE: f32 = 50.0;
@@ -33,7 +33,10 @@ pub fn spawn_enemy(
             },
             Enemy {
                 name: "Enemy".to_string(),
-                direction: Vec2::new(random::<f32>() * 1.0, random::<f32>() * 1.0),
+                direction: Vec2::new(
+                    rand::thread_rng().gen_range(-1.0..=1.0),
+                    rand::thread_rng().gen_range(-1.0..=1.0),
+                ),
             },
             Name::new(format!("Enemy-{}", i)),
         ));
