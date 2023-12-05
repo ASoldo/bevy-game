@@ -4,6 +4,7 @@ use rand::{random, Rng};
 
 pub const ENEMY_SPEED: f32 = 200.0;
 pub const ENEMY_SIZE: f32 = 50.0;
+pub const ENEMY_COUNT: usize = 5000;
 
 #[derive(Component, Default, Resource, Reflect)]
 #[reflect(Resource, Default)]
@@ -41,7 +42,7 @@ pub fn spawn_enemy(
         .spawn((Name::new("Enemies"), TransformBundle::default()))
         .id();
 
-    for i in 0..5 {
+    for i in 0..ENEMY_COUNT {
         let entity = commands
             .spawn((
                 SpriteBundle {
