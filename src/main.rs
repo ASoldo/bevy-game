@@ -259,20 +259,24 @@ fn main() {
         .add_systems(
             Startup,
             (
+                send_requests,
                 setup_scene,
                 spawn_new_player,
                 spawn_enemy,
                 setup_person,
                 print_person_name,
-                send_requests,
-            ),
+            )
+                .chain(),
         )
         .add_systems(
             Update,
             (
-                handle_responses,
-                display_pokemon_name,
-                update_pokemon_name_ui,
+                (
+                    handle_responses,
+                    display_pokemon_name,
+                    update_pokemon_name_ui,
+                )
+                    .chain(),
                 (player_movement, confine_player_movement).chain(),
                 (
                     update_enemy_direction,

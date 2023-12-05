@@ -19,7 +19,7 @@ pub fn spawn_enemy(
 ) {
     let _window: &Window = window_query.get_single().unwrap();
 
-    for i in 0..500 {
+    for i in 0..5000 {
         commands.spawn((
             SpriteBundle {
                 transform: Transform::from_xyz(0.0, 0.0, 0.0),
