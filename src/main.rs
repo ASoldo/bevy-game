@@ -6,7 +6,6 @@ mod player;
 use player::{confine_player_movement, player_movement, spawn_new_player, Player};
 
 mod enemy;
-use enemy::{enemy_movement, spawn_enemy, update_enemy_direction, Enemy};
 use enemy::{confine_enemy_movement, enemy_movement, spawn_enemy, update_enemy_direction, Enemy};
 
 use bevy::prelude::*;
