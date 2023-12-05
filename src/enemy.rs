@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
-use rand::Rng;
+use rand::{random, Rng};
 
 pub const ENEMY_SPEED: f32 = 200.0;
 pub const ENEMY_SIZE: f32 = 50.0;
@@ -30,10 +30,10 @@ pub fn spawn_enemy(
                     sprite: Sprite {
                         custom_size: Some(Vec2::new(50.0, 50.0)),
                         color: Color::Rgba {
-                            red: rand::thread_rng().gen_range(0. ..=1.0),
-                            green: rand::thread_rng().gen_range(0. ..=1.0),
-                            blue: rand::thread_rng().gen_range(0. ..=1.0),
-                            alpha: rand::thread_rng().gen_range(0.1..=1.0),
+                            red: random::<f32>(),
+                            green: random::<f32>(),
+                            blue: random::<f32>(),
+                            alpha: random::<f32>(),
                         },
                         ..default()
                     },
