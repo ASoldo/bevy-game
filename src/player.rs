@@ -1,4 +1,3 @@
-use bevy::ecs::query::QuerySingleError;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 
