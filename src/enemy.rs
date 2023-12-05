@@ -29,7 +29,12 @@ pub fn spawn_enemy(
                     transform: Transform::from_xyz(0.0, 0.0, 0.0),
                     sprite: Sprite {
                         custom_size: Some(Vec2::new(50.0, 50.0)),
-                        color: Color::RED,
+                        color: Color::Rgba {
+                            red: rand::thread_rng().gen_range(0. ..=1.0),
+                            green: rand::thread_rng().gen_range(0. ..=1.0),
+                            blue: rand::thread_rng().gen_range(0. ..=1.0),
+                            alpha: rand::thread_rng().gen_range(0.1..=1.0),
+                        },
                         ..default()
                     },
                     texture: asset_server.load("img/Logo.png"),
