@@ -6,6 +6,7 @@ mod player;
 use player::{confine_player_movement, player_movement, spawn_new_player, Player};
 
 mod enemy;
+use enemy::{enemy_movement, spawn_enemy, update_enemy_direction, Enemy};
 
 use bevy::prelude::*;
 use bevy::window::{PresentMode, Window, WindowPlugin, WindowTheme};
@@ -245,6 +246,8 @@ fn main() {
         .register_type::<Person>()
         .init_resource::<Player>()
         .register_type::<Player>()
+        .init_resource::<Enemy>()
+        .register_type::<Enemy>()
         .init_resource::<PokemonName>()
         .register_type::<PokemonName>()
         .insert_resource(ReqTimer(Timer::new(
@@ -253,7 +256,10 @@ fn main() {
         )))
         .insert_resource(PokemonName::default())
         .add_plugins(ReqwestPlugin)
-        .add_systems(Startup, (setup_scene, send_requests, spawn_new_player))
+        .add_systems(
+            Startup,
+            (setup_scene, send_requests, spawn_new_player, spawn_enemy),
+        )
         .add_systems(
             Update,
             (
@@ -267,6 +273,8 @@ fn main() {
             Update,
             (
                 player_movement,
+                enemy_movement,
+                update_enemy_direction,
                 confine_player_movement,
                 print_person_name.after(setup_person),
             ),
