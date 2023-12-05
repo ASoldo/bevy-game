@@ -238,8 +238,8 @@ fn main() {
                 ..default()
             }),
         ))
-        .register_type::<Option<Vec2>>()
-        .register_type::<Option<Rect>>()
+        // .register_type::<Option<Vec2>>()
+        // .register_type::<Option<Rect>>()
         .init_resource::<MarkerComponent>()
         .register_type::<MarkerComponent>()
         .init_resource::<Person>()
@@ -258,7 +258,14 @@ fn main() {
         .add_plugins(ReqwestPlugin)
         .add_systems(
             Startup,
-            (setup_scene, send_requests, spawn_new_player, spawn_enemy),
+            (
+                setup_scene,
+                spawn_new_player,
+                spawn_enemy,
+                setup_person,
+                print_person_name,
+                send_requests,
+            ),
         )
         .add_systems(
             Update,
@@ -266,20 +273,17 @@ fn main() {
                 handle_responses,
                 display_pokemon_name,
                 update_pokemon_name_ui,
-            ),
-        )
-        .add_systems(Startup, (setup_person, print_person_name))
-        .add_systems(
-            Update,
-            (
-                player_movement,
-                enemy_movement,
-                update_enemy_direction,
                 confine_player_movement,
-                confine_enemy_movement,
-                print_person_name.after(setup_person),
+                player_movement,
+                (
+                    update_enemy_direction,
+                    confine_enemy_movement,
+                    enemy_movement,
+                )
+                    .chain(),
             ),
         );
+    // app.add_systems(Update, (resize_notificator.before(second_system), second_system))
 
     #[cfg(feature = "inspector")]
     {
@@ -288,9 +292,6 @@ fn main() {
             .init_resource::<MyComponent>()
             .register_type::<Configuration>()
             .register_type::<MyComponent>()
-            // .add_plugins(ResourceInspectorPlugin::<Configuration>::default())
-            // .add_plugins(ResourceInspectorPlugin::<MyComponent>::default())
-            // .add_plugins(ResourceInspectorPlugin::<Time>::default())
             .add_plugins(DefaultPickingPlugins)
             .add_plugins(WorldInspectorPlugin::new());
     }

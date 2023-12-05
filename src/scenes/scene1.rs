@@ -66,10 +66,10 @@ pub fn setup_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
         )
         .insert(Name::new("Text UI"));
 
-    commands
-        .spawn(DynamicSceneBundle {
-            scene: asset_server.load("scenes/scene.scn.ron"),
-            ..default()
-        })
-        .insert(Name::new("Dynamic Scene"));
+    // commands
+    //     .spawn(DynamicSceneBundle {
+    //         scene: asset_server.load("scenes/scene.scn.ron"),
+    //         ..default()
+    //     })
+    //     .insert(Name::new("Dynamic Scene"));
 }
