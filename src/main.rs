@@ -273,8 +273,7 @@ fn main() {
                 handle_responses,
                 display_pokemon_name,
                 update_pokemon_name_ui,
-                confine_player_movement,
-                player_movement,
+                (player_movement, confine_player_movement).chain(),
                 (
                     update_enemy_direction,
                     confine_enemy_movement,
