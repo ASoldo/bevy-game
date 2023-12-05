@@ -261,8 +261,8 @@ fn main() {
             (
                 send_requests,
                 setup_scene,
-                spawn_new_player,
                 spawn_enemy,
+                spawn_new_player,
                 setup_person,
                 print_person_name,
             )
