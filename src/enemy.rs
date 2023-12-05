@@ -12,6 +12,25 @@ pub struct Enemy {
     pub direction: Vec2,
 }
 
+#[derive(Event)]
+pub struct SayHiEvent {
+    pub message: String,
+}
+
+pub fn read_hi(mut event_reader: EventReader<SayHiEvent>) {
+    for event in event_reader.read() {
+        println!("Event Message: {}", event.message);
+        bevy::log::info!("Event Message: {}", event.message);
+    }
+}
+
+pub fn say_hi(mut event_writer: EventWriter<SayHiEvent>) {
+    event_writer.send(SayHiEvent {
+        message: "Hi from event".to_string(),
+    });
+    bevy::log::info!("Hi from event");
+}
+
 pub fn spawn_enemy(
     mut commands: Commands,
     asset_server: ResMut<AssetServer>,
@@ -22,7 +41,7 @@ pub fn spawn_enemy(
         .spawn((Name::new("Enemies"), TransformBundle::default()))
         .id();
 
-    for i in 0..5000 {
+    for i in 0..5 {
         let entity = commands
             .spawn((
                 SpriteBundle {

@@ -6,7 +6,10 @@ mod player;
 use player::{confine_player_movement, player_movement, spawn_new_player, Player};
 
 mod enemy;
-use enemy::{confine_enemy_movement, enemy_movement, spawn_enemy, update_enemy_direction, Enemy};
+use enemy::{
+    confine_enemy_movement, enemy_movement, read_hi, say_hi, spawn_enemy, update_enemy_direction,
+    Enemy, SayHiEvent,
+};
 
 use bevy::prelude::*;
 use bevy::window::{PresentMode, Window, WindowPlugin, WindowTheme};
@@ -248,6 +251,7 @@ fn main() {
         .register_type::<Player>()
         .init_resource::<Enemy>()
         .register_type::<Enemy>()
+        .add_event::<SayHiEvent>()
         .init_resource::<PokemonName>()
         .register_type::<PokemonName>()
         .insert_resource(ReqTimer(Timer::new(
@@ -265,6 +269,7 @@ fn main() {
                 spawn_new_player,
                 setup_person,
                 print_person_name,
+                say_hi,
             )
                 .chain(),
         )
@@ -284,6 +289,7 @@ fn main() {
                     enemy_movement,
                 )
                     .chain(),
+                read_hi,
             ),
         );
     // app.add_systems(Update, (resize_notificator.before(second_system), second_system))
