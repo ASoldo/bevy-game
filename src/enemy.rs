@@ -18,28 +18,35 @@ pub fn spawn_enemy(
     window_query: Query<&Window, With<PrimaryWindow>>,
 ) {
     let _window: &Window = window_query.get_single().unwrap();
+    let parent: Entity = commands
+        .spawn((Name::new("Enemies"), TransformBundle::default()))
+        .id();
 
     for i in 0..5000 {
-        commands.spawn((
-            SpriteBundle {
-                transform: Transform::from_xyz(0.0, 0.0, 0.0),
-                sprite: Sprite {
-                    custom_size: Some(Vec2::new(50.0, 50.0)),
-                    color: Color::RED,
+        let entity = commands
+            .spawn((
+                SpriteBundle {
+                    transform: Transform::from_xyz(0.0, 0.0, 0.0),
+                    sprite: Sprite {
+                        custom_size: Some(Vec2::new(50.0, 50.0)),
+                        color: Color::RED,
+                        ..default()
+                    },
+                    texture: asset_server.load("img/Logo.png"),
                     ..default()
                 },
-                texture: asset_server.load("img/Logo.png"),
-                ..default()
-            },
-            Enemy {
-                name: "Enemy".to_string(),
-                direction: Vec2::new(
-                    rand::thread_rng().gen_range(-1.0..=1.0),
-                    rand::thread_rng().gen_range(-1.0..=1.0),
-                ),
-            },
-            Name::new(format!("Enemy-{}", i)),
-        ));
+                Enemy {
+                    name: "Enemy".to_string(),
+                    direction: Vec2::new(
+                        rand::thread_rng().gen_range(-1.0..=1.0),
+                        rand::thread_rng().gen_range(-1.0..=1.0),
+                    ),
+                },
+                Name::new(format!("Enemy-{}", i)),
+            ))
+            .id();
+
+        commands.entity(parent).push_children(&[entity]);
     }
 }
 
