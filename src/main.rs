@@ -2,6 +2,9 @@ mod scenes;
 // use bevy::time::common_conditions::on_timer;
 // use std::time::Duration;
 //
+mod player;
+
+use player::{confine_player_movement, player_movement, spawn_new_player, Player};
 
 use bevy::prelude::*;
 use bevy::window::{PresentMode, Window, WindowPlugin, WindowTheme};
@@ -25,6 +28,37 @@ struct PokemonName {
     name: Option<String>,
     created: bool,
     ui_entity: Option<Entity>, // Store the UI entity
+}
+
+#[derive(Component, Resource, Reflect, Default)]
+#[reflect(Resource, Default)]
+pub struct Person {
+    pub name: String,
+    pub person_state: PersonState,
+}
+
+#[derive(Default, Debug, Reflect)]
+pub enum PersonState {
+    Idle,
+    #[default]
+    Happy,
+    Sad,
+}
+
+pub fn print_person_name(person_query: Query<&Person>) {
+    for _person in person_query.iter() {
+        // println!("Person name: {}", person.name);
+        // bevy::log::info!("Person name: {}", person.name);
+    }
+}
+
+pub fn setup_person(mut commands: Commands) {
+    commands
+        .spawn(Person {
+            name: "Soldo".to_string(),
+            person_state: PersonState::Happy,
+        })
+        .insert(Name::new("Soldo"));
 }
 
 fn create_pokemon_name_ui(
@@ -206,6 +240,10 @@ fn main() {
         .register_type::<Option<Rect>>()
         .init_resource::<MarkerComponent>()
         .register_type::<MarkerComponent>()
+        .init_resource::<Person>()
+        .register_type::<Person>()
+        .init_resource::<Player>()
+        .register_type::<Player>()
         .init_resource::<PokemonName>()
         .register_type::<PokemonName>()
         .insert_resource(ReqTimer(Timer::new(
@@ -214,13 +252,22 @@ fn main() {
         )))
         .insert_resource(PokemonName::default())
         .add_plugins(ReqwestPlugin)
-        .add_systems(Startup, (setup_scene, send_requests))
+        .add_systems(Startup, (setup_scene, send_requests, spawn_new_player))
         .add_systems(
             Update,
             (
                 handle_responses,
                 display_pokemon_name,
                 update_pokemon_name_ui,
+            ),
+        )
+        .add_systems(Startup, (setup_person, print_person_name))
+        .add_systems(
+            Update,
+            (
+                player_movement,
+                confine_player_movement,
+                print_person_name.after(setup_person),
             ),
         );
 
