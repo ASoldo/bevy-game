@@ -77,15 +77,16 @@ pub fn confine_player_movement(
 
         let mut translation: Vec3 = player_transform.translation;
 
-        if translation.x < x_min {
+        if translation.x < x_min && player_transform.translation.x > (window.width() / -2.0) {
             translation.x = x_min;
-        } else if translation.x > x_max {
+        } else if translation.x > x_max && player_transform.translation.x < (window.width() / 2.0) {
             translation.x = x_max;
         }
 
-        if translation.y < y_min {
+        if translation.y < y_min && player_transform.translation.y < (window.height() / 2.0) {
             translation.y = y_min;
-        } else if translation.y > y_max {
+        } else if translation.y > y_max && player_transform.translation.y > (window.height() / -2.0)
+        {
             translation.y = y_max;
         }
 

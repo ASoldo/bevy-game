@@ -3,8 +3,9 @@ mod scenes;
 // use std::time::Duration;
 //
 mod player;
-
 use player::{confine_player_movement, player_movement, spawn_new_player, Player};
+
+mod enemy;
 
 use bevy::prelude::*;
 use bevy::window::{PresentMode, Window, WindowPlugin, WindowTheme};
