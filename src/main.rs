@@ -1,4 +1,10 @@
+use bevy::prelude::*;
+use bevy::window::{PresentMode, Window, WindowPlugin, WindowTheme};
+
+use bevy_asset::AssetMetaCheck;
+
 mod scenes;
+use scenes::scene1::setup_scene;
 // use bevy::time::common_conditions::on_timer;
 // use std::time::Duration;
 //
@@ -7,15 +13,9 @@ use player::{confine_player_movement, player_movement, spawn_new_player, Player}
 
 mod enemy;
 use enemy::{
-    confine_enemy_movement, enemy_movement, read_hi, say_hi, spawn_enemy, update_enemy_direction,
-    Enemy, SayHiEvent,
+    confine_enemy_movement, enemy_movement, get_score, read_hi, say_hi, set_score, spawn_enemy,
+    tick_my_timer, update_enemy_direction, Enemy, MyTimer, SayHiEvent, Score,
 };
-
-use bevy::prelude::*;
-use bevy::window::{PresentMode, Window, WindowPlugin, WindowTheme};
-
-use bevy_asset::AssetMetaCheck;
-use scenes::scene1::setup_scene;
 
 mod components;
 use crate::components::component::MarkerComponent;
@@ -243,6 +243,10 @@ fn main() {
         ))
         // .register_type::<Option<Vec2>>()
         // .register_type::<Option<Rect>>()
+        .init_resource::<Score>()
+        .register_type::<Score>()
+        .init_resource::<MyTimer>()
+        .register_type::<MyTimer>()
         .init_resource::<MarkerComponent>()
         .register_type::<MarkerComponent>()
         .init_resource::<Person>()
@@ -270,6 +274,8 @@ fn main() {
                 setup_person,
                 print_person_name,
                 say_hi,
+                set_score,
+                get_score,
             )
                 .chain(),
         )
@@ -287,6 +293,7 @@ fn main() {
                     update_enemy_direction,
                     confine_enemy_movement,
                     enemy_movement,
+                    tick_my_timer,
                 )
                     .chain(),
                 read_hi,

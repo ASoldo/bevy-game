@@ -4,7 +4,8 @@ use rand::{random, Rng};
 
 pub const ENEMY_SPEED: f32 = 200.0;
 pub const ENEMY_SIZE: f32 = 50.0;
-pub const ENEMY_COUNT: usize = 5000;
+pub const ENEMY_COUNT: usize = 100;
+pub const TIMER_DURATION: f32 = 1.0;
 
 #[derive(Component, Default, Resource, Reflect)]
 #[reflect(Resource, Default)]
@@ -13,9 +14,48 @@ pub struct Enemy {
     pub direction: Vec2,
 }
 
+#[derive(Resource, Reflect, Default)]
+#[reflect(Resource, Default)]
+pub struct Score {
+    pub score: usize,
+}
+// Use when you want to set a default value for a resource that doesn't implement Default
+// impl Default for Score {
+//     fn default() -> Self {
+//         Self { score: 0 }
+//     }
+// }
+
+#[derive(Resource, Reflect)]
+#[reflect(Resource, Default)]
+pub struct MyTimer {
+    pub timer: Timer,
+}
+
+impl Default for MyTimer {
+    fn default() -> Self {
+        Self {
+            timer: Timer::from_seconds(TIMER_DURATION, TimerMode::Repeating),
+        }
+    }
+}
+
+pub fn tick_my_timer(mut my_timer: ResMut<MyTimer>, time: Res<Time>) {
+    my_timer.timer.tick(time.delta());
+}
+
 #[derive(Event)]
 pub struct SayHiEvent {
     pub message: String,
+}
+
+pub fn set_score(mut score: ResMut<Score>) {
+    score.score += 1;
+}
+
+pub fn get_score(score: Res<Score>) {
+    println!("Score: {}", score.score);
+    bevy::log::info!("Score: {}", score.score);
 }
 
 pub fn read_hi(mut event_reader: EventReader<SayHiEvent>) {
