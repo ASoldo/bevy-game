@@ -66,6 +66,41 @@ pub fn setup_scene(mut commands: Commands, asset_server: Res<AssetServer>) {
         )
         .insert(Name::new("Text UI"));
 
+    commands
+        .spawn(NodeBundle {
+            style: Style {
+                width: Val::Px(100.0),
+                height: Val::Px(100.0),
+                align_self: AlignSelf::Start,
+                justify_self: JustifySelf::End,
+                align_items: AlignItems::Center,
+                justify_content: JustifyContent::Center,
+                ..default()
+            },
+            background_color: BackgroundColor(Color::Rgba {
+                red: 0.,
+                green: 1.,
+                blue: 1.,
+                alpha: 1.,
+            }),
+            visibility: Visibility::Inherited,
+            ..default()
+        })
+        .with_children(|parent| {
+            parent.spawn(
+                TextBundle::from_section(
+                    "Ok",
+                    TextStyle {
+                        font: asset_server.load("fonts/Classyvogueregular.ttf"),
+                        font_size: 30.0,
+                        ..default()
+                    },
+                )
+                .with_text_alignment(TextAlignment::Center)
+                .with_style(Style { ..default() }),
+            );
+        });
+
     // commands
     //     .spawn(DynamicSceneBundle {
     //         scene: asset_server.load("scenes/scene.scn.ron"),

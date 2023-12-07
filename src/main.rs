@@ -1,3 +1,4 @@
+use bevy::ecs::prelude::*;
 use bevy::prelude::*;
 use bevy::window::{PresentMode, Window, WindowPlugin, WindowTheme};
 
@@ -23,6 +24,26 @@ use bevy_mod_reqwest::*;
 use serde_json;
 
 use bevy_web_asset::WebAssetPlugin;
+
+#[derive(Resource, Reflect, States, PartialEq, Eq, Debug, Clone, Hash, Default)]
+#[reflect(Resource)]
+pub enum MyState {
+    #[default]
+    Loading,
+    Idle,
+    Running,
+    Paused,
+}
+
+pub fn return_boolean() -> bool {
+    true
+}
+
+#[derive(SystemSet, Debug, Hash, PartialEq, Eq, Clone)]
+pub struct First;
+
+#[derive(SystemSet, Debug, Hash, PartialEq, Eq, Clone)]
+pub struct Second;
 
 #[derive(Resource)]
 struct ReqTimer(pub Timer);
@@ -241,10 +262,14 @@ fn main() {
                 ..default()
             }),
         ))
+        // .configure_sets(Update, First.after(Second))
         // .register_type::<Option<Vec2>>()
         // .register_type::<Option<Rect>>()
         .init_resource::<Score>()
         .register_type::<Score>()
+        .init_resource::<MyState>()
+        .register_type::<MyState>()
+        .add_state::<MyState>()
         .init_resource::<MyTimer>()
         .register_type::<MyTimer>()
         .init_resource::<MarkerComponent>()
@@ -258,11 +283,11 @@ fn main() {
         .add_event::<SayHiEvent>()
         .init_resource::<PokemonName>()
         .register_type::<PokemonName>()
+        .insert_resource(PokemonName::default())
         .insert_resource(ReqTimer(Timer::new(
             std::time::Duration::from_secs(1),
             TimerMode::Repeating,
         )))
-        .insert_resource(PokemonName::default())
         .add_plugins(ReqwestPlugin)
         .add_systems(
             Startup,

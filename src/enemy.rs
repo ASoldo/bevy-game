@@ -40,8 +40,20 @@ impl Default for MyTimer {
     }
 }
 
+impl MyTimer {
+    pub fn tell_me(&self, _message: String) {
+        // println!("Tell meeee {}", message);
+        // bevy::log::info!("Tell meeee {}", message);
+    }
+}
+
+trait TellMe {
+    fn tell_me(&self, message: String);
+}
+
 pub fn tick_my_timer(mut my_timer: ResMut<MyTimer>, time: Res<Time>) {
     my_timer.timer.tick(time.delta());
+    my_timer.tell_me(String::from("Olla Soldinjoo"));
 }
 
 #[derive(Event)]
