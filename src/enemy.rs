@@ -7,6 +7,26 @@ pub const ENEMY_SIZE: f32 = 50.0;
 pub const ENEMY_COUNT: usize = 100;
 pub const TIMER_DURATION: f32 = 1.0;
 
+pub trait Soldo {
+    fn soldo(&self, message: String);
+    fn count();
+}
+
+#[derive(Default)]
+pub struct MySoldo {
+    pub message: String,
+}
+
+impl Soldo for MySoldo {
+    fn soldo(&self, message: String) {
+        println!("message: {}", message);
+    }
+
+    fn count() {
+        println!("Counting...");
+    }
+}
+
 #[derive(Component, Default, Resource, Reflect)]
 #[reflect(Resource, Default)]
 pub struct Enemy {
@@ -63,6 +83,10 @@ pub struct SayHiEvent {
 
 pub fn set_score(mut score: ResMut<Score>) {
     score.score += 1;
+}
+/// this is my function
+pub fn return_tuple(name: String, age: usize) -> (String, usize) {
+    (String::from(format!("Hello from tuple: {}", name)), age)
 }
 
 pub fn get_score(score: Res<Score>) {

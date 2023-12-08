@@ -324,7 +324,6 @@ fn main() {
                 read_hi,
             ),
         );
-    // app.add_systems(Update, (resize_notificator.before(second_system), second_system))
 
     #[cfg(feature = "inspector")]
     {
