@@ -248,19 +248,25 @@ fn main() {
     app.insert_resource(AssetMetaCheck::Never)
         .add_plugins((
             WebAssetPlugin::default(),
-            DefaultPlugins.set(WindowPlugin {
-                primary_window: Some(Window {
-                    title: "I am a Window!".into(),
-                    resolution: (500., 500.).into(),
-                    present_mode: PresentMode::AutoVsync,
-                    fit_canvas_to_parent: true,
-                    prevent_default_event_handling: false,
-                    window_theme: Some(WindowTheme::Dark),
-                    visible: false,
+            DefaultPlugins
+                .set(WindowPlugin {
+                    primary_window: Some(Window {
+                        title: "I am a Window!".into(),
+                        resolution: (500., 500.).into(),
+                        present_mode: PresentMode::AutoVsync,
+                        fit_canvas_to_parent: true,
+                        prevent_default_event_handling: false,
+                        window_theme: Some(WindowTheme::Dark),
+                        visible: false,
+                        canvas: Some("#bevy-canvas".to_string()),
+                        ..default()
+                    }),
+                    ..default()
+                })
+                .set(AssetPlugin {
+                    mode: AssetMode::Unprocessed,
                     ..default()
                 }),
-                ..default()
-            }),
         ))
         // .configure_sets(Update, First.after(Second))
         // .register_type::<Option<Vec2>>()

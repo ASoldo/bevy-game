@@ -7,6 +7,14 @@ pub const ENEMY_SIZE: f32 = 50.0;
 pub const ENEMY_COUNT: usize = 100;
 pub const TIMER_DURATION: f32 = 1.0;
 
+#[derive(SystemSet, Hash, Eq, Clone, Debug, PartialEq, Default)]
+pub enum MyOptions {
+    #[default]
+    First,
+    Second,
+    Third,
+}
+
 pub trait Soldo {
     fn soldo(&self, message: String);
     fn count();
@@ -108,11 +116,109 @@ pub fn say_hi(mut event_writer: EventWriter<SayHiEvent>) {
     bevy::log::info!("Hi from event");
 }
 
+trait SomeTrait {
+    fn check_state(&self);
+}
+trait SomeOtherTrait {
+    fn other_state(&self);
+}
+
+#[derive(Debug)]
+pub enum PlayerState {
+    Idle { status: i32 },
+    Running(i32),
+    Jumping(i32),
+}
+
+impl SomeTrait for PlayerState {
+    fn check_state(&self) {
+        match self {
+            PlayerState::Idle { status } => {
+                println!("Idle: {:?}", status);
+                bevy::log::info!("Idle: {:?}", status);
+            }
+            PlayerState::Running(s) => {
+                println!("Running: {}", s);
+                bevy::log::info!("Running: {}", s);
+            }
+            PlayerState::Jumping(s) => {
+                println!("Jumping: {}", s);
+                bevy::log::info!("Jumping: {}", s);
+            }
+        }
+    }
+}
+
+impl SomeOtherTrait for PlayerState {
+    fn other_state(&self) {
+        match self {
+            PlayerState::Idle { status } => {
+                println!("Idle: {:?}", status);
+                bevy::log::info!("Idle: {:?}", status);
+            }
+            PlayerState::Running(s) => {
+                println!("Running: {}", s);
+                bevy::log::info!("Running: {}", s);
+            }
+            PlayerState::Jumping(s) => {
+                println!("Jumping: {}", s);
+                bevy::log::info!("Jumping: {}", s);
+            }
+        }
+    }
+}
+
+fn something_with_trait<T: SomeTrait + SomeOtherTrait>(player_state: &T) -> &T {
+    player_state.check_state();
+    player_state.other_state();
+    player_state
+}
+
 pub fn spawn_enemy(
     mut commands: Commands,
     asset_server: ResMut<AssetServer>,
     window_query: Query<&Window, With<PrimaryWindow>>,
 ) {
+    let some_string: Option<String> = Option::Some(String::from("Hello"));
+
+    match some_string {
+        Some(s) => {
+            println!("Some string: {}", s);
+            bevy::log::info!("Some string: {}", s);
+        }
+        None => {
+            println!("None");
+        }
+    }
+
+    let some_result: Result<String, i32> = Result::Err(1);
+    match &some_result {
+        Ok(s) => {
+            println!("Some result: {}", s);
+            bevy::log::info!("Some result: {}", s);
+        }
+        Err(e) => {
+            println!("Some eror result: {}", e);
+            bevy::log::info!("Some error result: {}", e);
+        }
+    }
+
+    match &some_result {
+        Ok(s) => {
+            println!("Some result: {}", s);
+            bevy::log::info!("Some result: {}", s);
+        }
+        Err(e) => println!("Some result: {}", e),
+    }
+
+    let some_player_state: PlayerState = PlayerState::Idle { status: 20 };
+
+    some_player_state.check_state();
+    some_player_state.other_state();
+
+    let some_trait = something_with_trait(&some_player_state);
+    some_trait.check_state();
+
     let _window: &Window = window_query.get_single().unwrap();
     let parent: Entity = commands
         .spawn((Name::new("Enemies"), TransformBundle::default()))
