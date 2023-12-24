@@ -1,6 +1,7 @@
 use bevy::ecs::prelude::*;
 use bevy::prelude::*;
 use bevy::window::{PresentMode, Window, WindowPlugin, WindowTheme};
+use wasm_bindgen::prelude::*;
 
 use bevy_asset::AssetMetaCheck;
 
@@ -238,6 +239,11 @@ struct MyComponent {
     name: String,
     config: Configuration,
     pokemon_name: PokemonName,
+}
+
+#[wasm_bindgen]
+pub fn soldo(name: String) {
+    println!("Hello {}", name);
 }
 
 fn main() {
